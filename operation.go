@@ -177,6 +177,12 @@ func (operation *Operation) registerSchemaType(schemaType string, astFile *ast.F
 	}
 	for _, imp := range astFile.Imports {
 		if imp.Name != nil && imp.Name.Name == pkgName { // the import had an alias that matched
+			var err error
+			impPath := strings.Replace(imp.Path.Value, `"`, ``, -1)
+			typeSpec, err = findTypeDef(impPath, typeName)
+			if err != nil {
+				return errors.Wrapf(err, "can not find type def: %q", schemaType)
+			}
 			break
 		}
 		impPath := strings.Replace(imp.Path.Value, `"`, ``, -1)
